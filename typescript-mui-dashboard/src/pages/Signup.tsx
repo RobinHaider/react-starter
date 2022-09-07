@@ -12,6 +12,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import * as yup from 'yup';
+import { Form, Formik } from 'formik';
 
 function Copyright(props: any) {
   return (
@@ -27,6 +29,27 @@ function Copyright(props: any) {
 }
 
 const theme = createTheme();
+
+interface MyFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+const initialValues: MyFormValues = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: ''
+};
+
+const validationSchema = yup.object({
+  firstName: yup.string().required('First Name is required'),
+  lastName: yup.string().required('Last Name is required'),
+  email: yup.string().email('Enter a valid email').required('Email is required'),
+  password: yup.string().min(8, 'Password should be of minimum 8 characters length').required('Password is required')
+});
 
 export default function SignUp() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -58,35 +81,48 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField autoComplete="given-name" name="firstName" required fullWidth id="firstName" label="First Name" autoFocus />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField required fullWidth id="lastName" label="Last Name" name="lastName" autoComplete="family-name" />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField required fullWidth id="email" label="Email Address" name="email" autoComplete="email" />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField required fullWidth name="password" label="Password" type="password" id="password" autoComplete="new-password" />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel control={<Checkbox value="allowExtraEmails" color="primary" />} label="I want to receive inspiration, marketing promotions and updates via email." />
-              </Grid>
-            </Grid>
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Sign Up
-            </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={(values, formikHelpers) => {
+              console.log(values);
+              formikHelpers.resetForm();
+            }}
+          >
+            {({ errors, isValid, touched, dirty }) => (
+              <Form>
+                <Box component="form" sx={{ mt: 3 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField autoComplete="given-name" name="firstName" required fullWidth id="firstName" label="First Name" autoFocus />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField required fullWidth id="lastName" label="Last Name" name="lastName" autoComplete="family-name" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField required fullWidth id="email" label="Email Address" name="email" autoComplete="email" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField required fullWidth name="password" label="Password" type="password" id="password" autoComplete="new-password" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControlLabel control={<Checkbox value="allowExtraEmails" color="primary" />} label="I want to receive inspiration, marketing promotions and updates via email." />
+                    </Grid>
+                  </Grid>
+                  <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    Sign Up
+                  </Button>
+                  <Grid container justifyContent="flex-end">
+                    <Grid item>
+                      <Link href="#" variant="body2">
+                        Already have an account? Sign in
+                      </Link>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Form>
+            )}
+          </Formik>
         </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>

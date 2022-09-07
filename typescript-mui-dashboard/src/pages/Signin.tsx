@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useFormik } from 'formik';
+import { Field, Form, Formik, useFormik } from 'formik';
 import * as yup from 'yup';
 
 function Copyright(props: any) {
@@ -46,23 +46,6 @@ const validationSchema = yup.object({
 });
 
 export default function SignIn() {
-  const formik = useFormik({
-    initialValues,
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values);
-    }
-  });
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password')
-    });
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -81,49 +64,60 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              error={Boolean(formik.errors.email) && Boolean(formik.touched.email)}
-              helperText={Boolean(formik.touched.email) && formik.errors.email}
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              error={Boolean(formik.errors.password) && Boolean(formik.touched.password)}
-              helperText={Boolean(formik.touched.password) && formik.errors.password}
-            />
-            <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Sign In
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
+          <Box sx={{ mt: 1 }}>
+            <Formik
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={(values, formikHelpers) => {
+                console.log(values);
+                formikHelpers.resetForm();
+              }}
+            >
+              {({ errors, isValid, touched, dirty }) => (
+                <Form>
+                  <Field
+                    margin="normal"
+                    fullWidth
+                    as={TextField}
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    error={Boolean(errors.email) && Boolean(touched.email)}
+                    helperText={Boolean(touched.email) && errors.email}
+                  />
+                  <Field
+                    margin="normal"
+                    fullWidth
+                    as={TextField}
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    error={Boolean(errors.password) && Boolean(touched.password)}
+                    helperText={Boolean(touched.password) && errors.password}
+                  />
+                  <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
+                  <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    Sign In
+                  </Button>
+                  <Grid container>
+                    <Grid item xs>
+                      <Link href="#" variant="body2">
+                        Forgot password?
+                      </Link>
+                    </Grid>
+                    <Grid item>
+                      <Link href="#" variant="body2">
+                        {"Don't have an account? Sign Up"}
+                      </Link>
+                    </Grid>
+                  </Grid>
+                </Form>
+              )}
+            </Formik>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
