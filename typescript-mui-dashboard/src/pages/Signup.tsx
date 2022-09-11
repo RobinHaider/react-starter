@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import * as yup from 'yup';
-import { Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikHelpers } from 'formik';
 
 function Copyright(props: any) {
   return (
@@ -35,32 +35,29 @@ interface MyFormValues {
   lastName: string;
   email: string;
   password: string;
+  terms: boolean;
 }
 
 const initialValues: MyFormValues = {
   firstName: '',
   lastName: '',
   email: '',
-  password: ''
+  password: '',
+  terms: false
 };
 
 const validationSchema = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
   email: yup.string().email('Enter a valid email').required('Email is required'),
-  password: yup.string().min(8, 'Password should be of minimum 8 characters length').required('Password is required')
+  password: yup.string().min(8, 'Password should be of minimum 8 characters length').required('Password is required'),
+  terms: yup.boolean().isTrue('Must accept the terms and policy')
 });
 
 export default function SignUp() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      firstName: data.get('firstName'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password')
-    });
+  const handleSubmit = (values: MyFormValues, formikHelpers: FormikHelpers<MyFormValues>) => {
+    console.log(values);
+    formikHelpers.resetForm();
   };
 
   return (
@@ -81,32 +78,63 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={(values, formikHelpers) => {
-              console.log(values);
-              formikHelpers.resetForm();
-            }}
-          >
+          <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
             {({ errors, isValid, touched, dirty }) => (
               <Form>
-                <Box component="form" sx={{ mt: 3 }}>
+                <Box sx={{ mt: 3 }}>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      <TextField autoComplete="given-name" name="firstName" required fullWidth id="firstName" label="First Name" autoFocus />
+                      <Field
+                        as={TextField}
+                        autoComplete="given-name"
+                        name="firstName"
+                        fullWidth
+                        id="firstName"
+                        label="First Name"
+                        autoFocus
+                        error={Boolean(errors.firstName) && Boolean(touched.firstName)}
+                        helperText={Boolean(touched.firstName) && errors.firstName}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField required fullWidth id="lastName" label="Last Name" name="lastName" autoComplete="family-name" />
+                      <Field
+                        as={TextField}
+                        fullWidth
+                        id="lastName"
+                        label="Last Name"
+                        name="lastName"
+                        autoComplete="family-name"
+                        error={Boolean(errors.lastName) && Boolean(touched.lastName)}
+                        helperText={Boolean(touched.lastName) && errors.lastName}
+                      />
                     </Grid>
                     <Grid item xs={12}>
-                      <TextField required fullWidth id="email" label="Email Address" name="email" autoComplete="email" />
+                      <Field
+                        as={TextField}
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        error={Boolean(errors.email) && Boolean(touched.email)}
+                        helperText={Boolean(touched.email) && errors.email}
+                      />
                     </Grid>
                     <Grid item xs={12}>
-                      <TextField required fullWidth name="password" label="Password" type="password" id="password" autoComplete="new-password" />
+                      <Field
+                        as={TextField}
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="new-password"
+                        error={Boolean(errors.password) && Boolean(touched.password)}
+                        helperText={Boolean(touched.password) && errors.password}
+                      />
                     </Grid>
                     <Grid item xs={12}>
-                      <FormControlLabel control={<Checkbox value="allowExtraEmails" color="primary" />} label="I want to receive inspiration, marketing promotions and updates via email." />
+                      <FormControlLabel control={<Field as={Checkbox} value="true" name="terms" id="terms" color="primary" />} label="I accept the terms and policy." />
                     </Grid>
                   </Grid>
                   <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
