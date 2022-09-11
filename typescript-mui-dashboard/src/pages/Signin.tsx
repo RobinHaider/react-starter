@@ -12,8 +12,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Field, Form, Formik, useFormik } from 'formik';
+import { Field, Form, Formik, FormikHelpers, useFormik } from 'formik';
 import * as yup from 'yup';
+import TextInput from '../components/TextInput';
 
 function Copyright(props: any) {
   return (
@@ -46,6 +47,10 @@ const validationSchema = yup.object({
 });
 
 export default function SignIn() {
+  const handleSubmit = (values: MyFormValues, formikHelpers: FormikHelpers<MyFormValues>) => {
+    console.log(values);
+    formikHelpers.resetForm();
+  };
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -65,17 +70,10 @@ export default function SignIn() {
             Sign in
           </Typography>
           <Box sx={{ mt: 1 }}>
-            <Formik
-              initialValues={initialValues}
-              validationSchema={validationSchema}
-              onSubmit={(values, formikHelpers) => {
-                console.log(values);
-                formikHelpers.resetForm();
-              }}
-            >
+            <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
               {({ errors, isValid, touched, dirty }) => (
                 <Form>
-                  <Field
+                  {/* <Field
                     margin="normal"
                     fullWidth
                     as={TextField}
@@ -86,7 +84,8 @@ export default function SignIn() {
                     autoFocus
                     error={Boolean(errors.email) && Boolean(touched.email)}
                     helperText={Boolean(touched.email) && errors.email}
-                  />
+                  /> */}
+                  <TextInput name="email" label="Email Address" autoFocus={true} />
                   <Field
                     margin="normal"
                     fullWidth
